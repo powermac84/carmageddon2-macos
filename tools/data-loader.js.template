@@ -1,0 +1,83 @@
+  var Module = typeof Module !== 'undefined' ? Module : {};
+  if (!Module.expectedDataFileDownloads) {
+    Module.expectedDataFileDownloads = 0;
+  }
+  Module.expectedDataFileDownloads++;
+  (function() {
+    if (Module['ENVIRONMENT_IS_PTHREAD'] || Module['$ww']) return;
+    var loadPackage = function(metadata) {
+      var PACKAGE_NAME = 'carma2web.data';
+      var REMOTE_PACKAGE_BASE = 'carma2web.data';
+      var REMOTE_PACKAGE_NAME = Module['locateFile'] ? Module['locateFile'](REMOTE_PACKAGE_BASE, '') : REMOTE_PACKAGE_BASE;
+      var REMOTE_PACKAGE_SIZE = metadata['remote_package_size'];
+      function fetchRemotePackage(packageName, packageSize, callback, errback) {
+        var parts = __PARTS_JSON__;
+        var buf = new Uint8Array(packageSize), loaded = parts.map(function () { return 0; }), done = 0, failed = false;
+        function status() {
+          var l = 0;
+          for (var i = 0; i < loaded.length; i++) l += loaded[i];
+          if (Module['setStatus']) Module['setStatus']('Loading game data: ' + Math.floor(l / 1048576) + ' of ' + Math.floor(packageSize / 1048576) + ' MB');
+        }
+        function get(i, tries) {
+          var name = packageName + '.' + ('00' + i).slice(-3);
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', name, true);
+          xhr.responseType = 'arraybuffer';
+          function retry() {
+            loaded[i] = 0;
+            if (tries < 4) { setTimeout(function () { get(i, tries + 1); }, 1500 * (tries + 1)); return; }
+            if (failed) return;
+            failed = true;
+            if (Module['setStatus']) Module['setStatus']('Could not load ' + name + '. Please reload the page.');
+            errback(new Error('NetworkError for: ' + name));
+          }
+          xhr.onprogress = function (e) { loaded[i] = e.loaded; status(); };
+          xhr.onerror = retry;
+          xhr.onload = function () {
+            if ((xhr.status == 200 || xhr.status == 304 || (xhr.status == 0 && xhr.response)) && xhr.response && xhr.response.byteLength === parts[i][1]) {
+              buf.set(new Uint8Array(xhr.response), parts[i][0]);
+              loaded[i] = parts[i][1];
+              status();
+              if (++done === parts.length) callback(buf.buffer);
+            } else retry();
+          };
+          xhr.send(null);
+        }
+        status();
+        for (var i = 0; i < parts.length; i++) get(i, 0);
+      }
+      function handleError(error) {
+        console.error('package error:', error);
+      }
+      var fetchedCallback = null;
+      var fetched = Module['getPreloadedPackage'] ? Module['getPreloadedPackage'](REMOTE_PACKAGE_NAME, REMOTE_PACKAGE_SIZE) : null;
+      if (!fetched) fetchRemotePackage(REMOTE_PACKAGE_NAME, REMOTE_PACKAGE_SIZE, function(data) {
+        if (fetchedCallback) { fetchedCallback(data); fetchedCallback = null; } else { fetched = data; }
+      }, handleError);
+      function runWithFS() {
+__PATHS_JS__
+        var files = metadata['files'];
+        for (var i = 0; i < files.length; ++i) Module['addRunDependency']('fp ' + files[i].filename);
+        function processPackageData(arrayBuffer) {
+          var byteArray = new Uint8Array(arrayBuffer);
+          for (var i = 0; i < files.length; ++i) {
+            var f = files[i];
+            Module['FS_createDataFile'](f.filename, null, byteArray.subarray(f.start, f.end), true, true, true);
+            Module['removeRunDependency']('fp ' + f.filename);
+          }
+          Module['removeRunDependency']('datafile_carma2web.data');
+        }
+        Module['addRunDependency']('datafile_carma2web.data');
+        if (!Module.preloadResults) Module.preloadResults = {};
+        Module.preloadResults[PACKAGE_NAME] = {fromCache: false};
+        if (fetched) { processPackageData(fetched); fetched = null; } else { fetchedCallback = processPackageData; }
+      }
+      if (Module['calledRun']) {
+        runWithFS();
+      } else {
+        if (!Module['preRun']) Module['preRun'] = [];
+        Module['preRun'].push(runWithFS);
+      }
+    };
+    loadPackage(__METADATA_JSON__);
+  })();

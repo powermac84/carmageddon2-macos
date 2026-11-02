@@ -1,0 +1,22 @@
+name: Source checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Audit public source
+        run: python3 tools/audit-release.py .
+      - name: Check build scripts
+        run: bash -n tools/build-app.sh tools/package-release.sh tools/dependencies/*.sh
+      - name: Compile the native app and importer
+        run: |
+          mkdir -p /tmp/c2-check
+          xcrun swiftc -swift-version 5 -O -target arm64-apple-macos14.0 -framework AppKit -framework WebKit -framework Network -framework AVKit -framework AVFoundation host/*.swift -o /tmp/c2-check/host
+          xcrun swiftc -swift-version 5 -O -target arm64-apple-macos14.0 tools/DataImporter.swift -o /tmp/c2-check/c2-data
+      - name: Importer negative-path checks
+        run: C2_IMPORT_HELPER=/tmp/c2-check/c2-data python3 tests/test_importer.py

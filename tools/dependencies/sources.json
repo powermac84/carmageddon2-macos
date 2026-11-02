@@ -1,0 +1,44 @@
+{
+  "target": "arm64-apple-macos14.0",
+  "sources": [
+    {
+      "archive": "ffmpeg-9.0.2.tar.xz",
+      "url": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz",
+      "sha256": "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e",
+      "license": "LGPL-2.1-or-later"
+    },
+    {
+      "archive": "innoextract-1.9.tar.gz",
+      "url": "https://codeload.github.com/dscharrer/innoextract/tar.gz/refs/tags/1.9",
+      "sha256": "576657932e92835343a829c3be1baefc34593d1f84309df93eb1d39a8bb51510",
+      "license": "Zlib"
+    },
+    {
+      "archive": "boost_1_85_0.tar.bz2",
+      "url": "https://archives.boost.io/release/1.85.0/source/boost_1_85_0.tar.bz2",
+      "sha256": "7009fe1faa1697476bdc7027703a2badb84e849b7b0baad5086b087b971f8617",
+      "license": "BSL-1.0"
+    },
+    {
+      "archive": "xz-5.8.4.tar.xz",
+      "url": "https://github.com/tukaani-project/xz/releases/download/v5.8.4/xz-5.8.4.tar.xz",
+      "sha256": "4ce24038fd4221e0d13bc1a2de7a4db56e90b92b3bf75321f6c14be73f65de4b",
+      "license": "0BSD (liblzma)"
+    }
+  ],
+  "sourceModifications": {
+    "ffmpeg": [],
+    "boost": [],
+    "liblzma": [],
+    "innoextract": [
+      "cmake/VersionScript.cmake: require CMake3.5 policy compatibility for CMake4",
+      "src/stream/slice.cpp: explicitly include boost/filesystem/directory.hpp for Boost1.85"
+    ]
+  },
+  "buildScripts": [
+    "common.sh",
+    "build-ffmpeg.sh",
+    "build-innoextract.sh"
+  ],
+  "redistribution": "Bundle all license texts; provide the exact FFmpeg archive and complete converter build scripts with the binary release. No proprietary game data is included."
+}

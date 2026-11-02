@@ -1,0 +1,60 @@
+{
+  "date": "2026-11-02",
+  "platform": "Apple Silicon macOS",
+  "transport": "native Swift C2LANRelay; RFC6455 WebSocket IPX relay",
+  "protocolChecks": {
+    "actualWebSocketClients": true,
+    "broadcastSourceRewrite": true,
+    "noSenderEcho": true,
+    "unicastReplies": true,
+    "roomIsolation": true,
+    "pingPong": true,
+    "fragmentedBinaryMessages": true,
+    "oversizeClose1009": true,
+    "duplicateNodeReplacement": true
+  },
+  "actualGameSmoke": {
+    "basis": "Validated version1.3 x86-to-WebAssembly game runtime with original licensed data served only on loopback; two isolated headless Chrome windows",
+    "track": "New Sumo",
+    "gameMode": "Driven to Destruction",
+    "players": 2,
+    "originalGameHostDiscovery": true,
+    "originalGameGuestJoin": true,
+    "bothReady": true,
+    "bothRaceStarted": true,
+    "hostNetMode": 2,
+    "guestNetMode": 3,
+    "bothRacingFlag": 1,
+    "matchingPlayerIDs": true,
+    "initialCarPositionsMatch": true,
+    "hostAccelerationSeconds": 2,
+    "hostCarReportedByHost": [
+      22.83819580078125,
+      -6.0022292137146,
+      -2.714599609375
+    ],
+    "hostCarReportedByGuest": [
+      22.835126876831055,
+      -6.004425048828125,
+      -2.7084765434265137
+    ],
+    "positionDifferenceGameUnits": 0.007192490713750435,
+    "interpreterFaults": 0,
+    "jitCompilationFailures": 0,
+    "warmFPS": [
+      60.00793493248063,
+      59.99900828120952
+    ],
+    "laterFPS": [
+      55.41964151880675,
+      53.943359471911435
+    ]
+  },
+  "limits": [
+    "This is a local two-client game smoke test; it is not a full session on two physical Macs or across the Internet.",
+    "Native WebKit settings/CSP integration is verified separately by the host integration test.",
+    "Unmodified Windows or classic Mac retail games do not connect directly to the WebSocket relay.",
+    "The Computer name field sets the runtime computer name; the original in-game Driver field controls the racer nickname.",
+    "No original game files, screenshots, installer contents, or personal profiles are included in this verification fixture."
+  ]
+}
